@@ -1,38 +1,19 @@
-
-
 import numpy as np
 import os
 import pandas as pd
 import geopandas as gpd
-import ConfigParser
+import json
 
-
-# functions
-
-
-def ConfigSectionMap(section):
-    dict1 = {}
-    options = Config.options(section)
-    for option in options:
-        try:
-            dict1[option] = Config.get(section, option)
-            if dict1[option] == -1:
-                DebugPrint("skip: %s" % option)
-        except:
-            print("exception on %s!" % option)
-            dict1[option] = None
-    return dict1
-
+config_file_location = './sabre_out_config.json'
 
 if __name__ == '__main__':
 
-    Config = ConfigParser.ConfigParser()
+    config = json.load(open(config_file_location))
 
-    Config.read('sabre_out_config.ini')
-    sabre_out_dir = ConfigSectionMap('directories')['sabre_out_dir']
-    output_dir = ConfigSectionMap('directories')['output_dir']
-    output_text = ConfigSectionMap('outputs')['output_text']
-    output_shp = ConfigSectionMap('outputs')['output_shp']
+    sabre_out_dir = config['directories']['sabre_out_dir']
+    output_dir = config['directories']['output_dir']
+    output_text = config['outputs']['output_text']
+    output_shp = config['outputs']['output_shp']
 
     sabre_out_fls = os.listdir(sabre_out_dir)
     sabre_ITS_path = os.sep.join([sabre_out_dir,[s for s in sabre_out_fls if "_ITS.txt" in s][0]])

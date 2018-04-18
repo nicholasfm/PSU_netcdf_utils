@@ -1,27 +1,11 @@
-
 import numpy as np
 import os
-import ConfigParser
 from netCDF4 import num2date, date2num
 from netCDF4 import Dataset
 import pandas as pd
+import json
 
-
-# ## Define functions
-
-def ConfigSectionMap(section):
-    dict1 = {}
-    options = Config.options(section)
-    for option in options:
-        try:
-            dict1[option] = Config.get(section, option)
-            if dict1[option] == -1:
-                DebugPrint("skip: %s" % option)
-        except Exception as e:
-            print("Exception loading %s from .ini !" % option)
-            print(e)
-            dict1[option] = None
-    return dict1
+config_file_location = './process_grids_config.json'
 
 def find_nearest(array,target_values):
     idx = np.zeros_like(target_values).astype(int)
@@ -59,15 +43,17 @@ def grid_to_dict(field,grids_dict,target_loc,ref_time):
     try:
         fn = '/'.join([grid_dir,[s for s in grids if field[0] in s][0]])
     except:
-        print('Error loading %s, check files exist and are correct in config.'  % field[0])
+        print('Error loading %s, check files exist and are correct in config json'  % field[0])
     data, datenum = read_grid(field[0],
                      fn,
                      target_loc[:,1],
                      target_loc[:,2],
                      )
     if np.array_equal(ref_time,datenum):
+        print('Retrieving ' + field[1] + ' from grids.')
         grids_dict[field[1]] = np.ravel(data)
     else:
+        print('Retrieving ' + field[1] + ' from grids.')
         print(field[1] + ' is shorter than Temperature field. Filling forward...')
         infill_time = pd.merge(pd.DataFrame(ref_time),pd.DataFrame(np.column_stack((datenum,datenum))),how='left').copy()
         if(pd.isnull(infill_time[1][0])):
@@ -85,18 +71,16 @@ def grid_to_dict(field,grids_dict,target_loc,ref_time):
 if __name__ == '__main__':
 
     # Load config
-    Config = ConfigParser.ConfigParser()
-    Config.optionxform=str
-    Config.read('process_grids_config.ini')
+    config = json.load(open(config_file_location))
 
-    grid_dir = ConfigSectionMap('filepaths')['grid_dir']
-    target_locations_file = ConfigSectionMap('filepaths')['target_locations_file']
-    output_file = ConfigSectionMap('filepaths')['output_file']
+    grid_dir = config['filepaths']['grid_dir']
+    target_locations_file = config['filepaths']['target_locations_file']
+    output_file = config['filepaths']['output_file']
 
     #field_names is a list of lists: Each list
-    field_names = ConfigSectionMap('fieldnames')
+    field_names = config['fieldnames']
 
-    timezone_offset = int(ConfigSectionMap('others')['timezone_offset'])
+    timezone_offset = int(config['timezone_offset'])
 
     grids = os.listdir(grid_dir)
 
@@ -114,6 +98,7 @@ if __name__ == '__main__':
         print(grids)
 
     #Read grid of T_SFC, sampling only the required lat/lon's as in Location.txt
+    print('Retrieving Temperature from grids.')
     t_sfc, time_sfc = read_grid('T_SFC',fn,target_locations[:,1],target_locations[:,2])
 
     #Convert timestamps from the netCDF to strings via python datetime objects
@@ -152,5 +137,5 @@ if __name__ == '__main__':
     df = df[['Location','Date','Temperature','RH','WindDir','WindSpeed','DroughtFactor','Curing','CloudCover']]
     df = df.sort_values(by=['Location','Date'])
 
-    print('Saving output to' + output_file)
+    print('Saving output to ' + output_file)
     df.to_csv(output_file,float_format='%.1f',index=False)

@@ -1,0 +1,16 @@
+{
+    "filepaths" : {
+      "grid_dir" : "../files_in/20141114_0921",
+      "target_locations_file" : "../files_in/BOM_Grids_Points.txt",
+      "output_file" : "../grids_out.csv"
+      },
+    "fieldnames"   :{
+      "RH_SFC" : "RH",
+      "Wind_Dir_SFC" : "WindDir",
+      "Wind_Mag_SFC" : "WindSpeed",
+      "DF_SFC" : "DroughtFactor",
+      "Curing_SFC" : "Curing",
+      "Sky_SFC" : "CloudCover"
+      },
+    "timezone_offset": 10
+}

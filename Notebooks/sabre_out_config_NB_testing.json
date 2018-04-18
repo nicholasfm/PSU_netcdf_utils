@@ -1,0 +1,11 @@
+
+{
+    "directories":{
+        "sabre_out_dir":"../files_in/SABRE_results/Rand_Sedgerly_5Dec_Ignto1215Scar_2016125",
+        "output_dir":"../files_out"
+      },
+    "outputs"   :{
+        "output_text":true,
+        "output_shp":true
+    }
+}
