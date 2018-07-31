@@ -84,7 +84,8 @@ if __name__ == '__main__':
 
     grids = os.listdir(grid_dir)
 
-    target_locations = np.loadtxt(target_locations_file,delimiter=',')
+    target_locations = np.genfromtxt(target_locations_file,delimiter=',')#dtype=[('id',str),('lat',float),('lon',float)])
+    #print(target_locations['lat'])
 
     tz_s = timezone_offset*60*60
 
@@ -106,14 +107,14 @@ if __name__ == '__main__':
 
     #Create an empty array of strings of the same size of the sampled T_SFC, where each cell is the right number of characters for the string timestamps
     times_out = np.chararray(np.shape(t_sfc),itemsize=len(timestamps_formatted[0]))
-    geo_id = np.zeros(np.shape(t_sfc))
+    geo_id = np.empty(np.shape(t_sfc))
 
 
 
     #Loop through Location.txt geo_id's provided
     for i in range(len(t_sfc[:,0])):
         #Fill in geo_ids
-        geo_id[i,:] = target_locations[:,0].astype(int)
+        geo_id[i,:] = target_locations[:,0].astype(str)
 
     for i in range(len(t_sfc[0,:])):
         #Fill in timestamps
@@ -121,7 +122,7 @@ if __name__ == '__main__':
 
     grids_out_dictionary = {}
 
-    grids_out_dictionary['Location'] = np.ravel(geo_id).astype(int)
+    grids_out_dictionary['Location'] = np.ravel(geo_id).astype(str)
     grids_out_dictionary['Date'] = np.ravel(times_out.astype(str))
     grids_out_dictionary['Temperature'] = np.ravel(t_sfc)
 
