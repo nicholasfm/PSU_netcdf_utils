@@ -1,7 +1,7 @@
 {
     "filepaths" : {
-      "grid_dir" : "./files_in/20141114_0921",
-      "target_locations_file" : "./files_in/BOM_Grids_Points.txt",
+      "grid_dir" : "./Weather",
+      "target_locations_file" : "./BOM_Grids_Points.txt",
       "output_file" : "./grids_out.csv"
       },
     "fieldnames"   :{
